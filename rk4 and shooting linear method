@@ -1,0 +1,56 @@
+'''
+This code solves Y' = F(x,Y), where x \in \R and Y\in \R^n
+'''
+
+import numpy as np
+def RK4(f,a,b,n,x0,dim):
+  u = np.zeros((n+1,dim),float)
+  h = (b-a)/n
+  t = np.array([a+i*h for i in range(n+1)])
+  u[0]=x0
+  for i in range(n):
+    K1 = f(t[i],u[i])
+    K2 = f(t[i]+h/2,u[i]+K1*h/2)
+    K3 = f(t[i]+h/2,u[i]+K2*h/2)
+    K4 = f(t[i]+h,u[i]+h*K3)
+    u[i+1]= u[i] + (h/6)*(K1+2*K2+2*K3+K4)
+  return u
+
+
+'''
+For a given problem of the form:
+$$y''(x) = p(x)y'(x) + q(x)y(x) + r(x), x\in [a,b]$$
+with $y(a)= \alpha$ y $y(b)=\beta$.
+The shooting linear method returns the discretization of y in [a,b]:
+'''
+def disparo(p,q,r,a,alfa,b,beta,n):
+  f = lambda x,z: np.array([z[1],
+                            q(x)*z[0]+p(x)*z[1]+r(x),
+                            z[3],
+                            q(x)*z[2]+p(x)*z[3]+r(x)])
+  z0 = np.array([alfa,0,0,1])
+  Z = RK4(f,a,b,n,z0,4)
+  y1 = np.transpose(Z)[0]
+  y2 = np.transpose(Z)[2]
+  Y = y1 + ((beta - y1[n])/y2[n])*y2
+  return Y
+
+'''
+When applied to a certain problem:
+'''
+import matplotlib.pyplot as plt
+p = lambda x: 0
+q = lambda x: -1
+r = lambda x: 0
+a, b = 1, 5
+alfa, beta = np.sin(1), np.sin(5)
+n = 20
+
+U = disparo(p,q,r,a,alfa,b,beta,n)
+h = (b-a)/n
+t = np.array([a+i*h for i in range(n+1)])
+plt.scatter(t,U, c = 'red', s = 5, label= 'discretización' )
+g = lambda x: np.sin(x)
+X = np.linspace(a,b,30)
+plt.plot(X,g(X), c= 'blue', label = 'Solución exacta $f(x) = sin(x)$')
+plt.legend()
