@@ -8,7 +8,7 @@ Original file is located at
 
 Buscamos resolver numéricamente la ecuación
 \begin{align*}
-  u_t  &= \alpha^2 u_{xx} \\
+u_t  &= \alpha^2 u_{xx} \\
 u(x,0) &= g(x)\\
 u(0,t) &= A \\
 u(L,t) &= B \\
